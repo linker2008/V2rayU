@@ -1,0 +1,33 @@
+name: Build V2rayU
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # CocoaPods 依赖（如果有 Podfile）
+    - name: Install CocoaPods
+      run: |
+        which pod || sudo gem install cocoapods
+        pod install || true
+
+    - name: Build with Xcode
+      run: |
+        xcodebuild -workspace V2rayU.xcworkspace -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+    # 保存构建产物
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: V2rayU-app
+        path: |
+          build/Release/V2rayU.app
