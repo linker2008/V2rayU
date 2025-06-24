@@ -333,7 +333,7 @@ class V2rayLaunch: NSObject {
 
         // just start: stop is so slow
         do {
-            let output = try runCommand(at: "/bin/launchctl", with: ["start", LAUNCH_AGENT_NAME])
+            let output = try runCommand(at: v2rayCoreFile, with: ["run", "-c", JsonConfigFilePath])
             print("Start v2ray-core: ok \(output)")
             return true
         } catch let error {
