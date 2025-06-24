@@ -1,0 +1,66 @@
+name: Build and Release V2rayU
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'       # 只有打 tag 时才触发，比如 v2.4.3
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install CocoaPods
+      run: |
+        which pod || sudo gem install cocoapods
+        pod install
+
+    - name: Build with Xcode
+      run: |
+        xcodebuild -workspace V2rayU.xcworkspace -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+
+    # 可选：打包 dmg（假设有 create-dmg 工具）
+    - name: Package to DMG
+      run: |
+        brew install create-dmg
+        APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "V2rayU.app" | head -n 1)
+        create-dmg "$APP_PATH" ./V2rayU.dmg
+
+    - name: Get version from tag
+      id: get_version
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.RELEASE_VERSION }}
+        name: "V2rayU ${{ env.RELEASE_VERSION }}"
+        body: "See changelog for details."
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload .app to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.RELEASE_VERSION }}
+        name: "V2rayU ${{ env.RELEASE_VERSION }}"
+        files: |
+          $(find ~/Library/Developer/Xcode/DerivedData -type d -name "V2rayU.app" | head -n 1)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload .dmg to Release
+      if: exists('V2rayU.dmg')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.RELEASE_VERSION }}
+        name: "V2rayU ${{ env.RELEASE_VERSION }}"
+        files: V2rayU.dmg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
