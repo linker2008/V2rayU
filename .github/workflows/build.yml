@@ -29,6 +29,8 @@ jobs:
     
     - name: Ensure xcworkspace exists
       run: |
+        pwd
+        ls -al
         if [ ! -f "V2rayU.xcworkspace" ]; then
           echo "❌ V2rayU.xcworkspace not found! pod install did not succeed."
           exit 1
