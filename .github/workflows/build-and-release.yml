@@ -56,8 +56,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload .dmg to Release
-      if: exists('V2rayU.dmg')
       uses: softprops/action-gh-release@v2
+      if: ${{ hashFiles('V2rayU.dmg') != '' }}
       with:
         tag_name: ${{ env.RELEASE_VERSION }}
         name: "V2rayU ${{ env.RELEASE_VERSION }}"
