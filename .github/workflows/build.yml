@@ -21,23 +21,20 @@ jobs:
       run: |
         which pod || sudo gem install cocoapods
         pod install
-      working-directory: ${{ github.workspace }}
 
     - name: Show current directory and contents
       run: |
         pwd
-        ls -al
-      working-directory: ${{ github.workspace }}
+        ls -l | cat -v
+        ls | od -c
     
     - name: Ensure xcworkspace exists
       run: |
         pwd
-        ls -al
         if [ ! -f "V2rayU.xcworkspace" ]; then
           echo "❌ V2rayU.xcworkspace not found! pod install did not succeed."
           exit 1
         fi
-      working-directory: ${{ github.workspace }}
 
     # 构建 V2rayU（根据项目实际，优先用 xcworkspace，否则用 xcodeproj）
     - name: Build V2rayU
