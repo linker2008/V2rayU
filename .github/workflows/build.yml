@@ -26,12 +26,11 @@ jobs:
       run: |
         pwd
         ls -l | cat -v
-        ls | od -c
     
     - name: Ensure xcworkspace exists
       run: |
         pwd
-        if [ ! -f "V2rayU.xcworkspace" ]; then
+        if [ ! -d "V2rayU.xcworkspace" ]; then
           echo "❌ V2rayU.xcworkspace not found! pod install did not succeed."
           exit 1
         fi
