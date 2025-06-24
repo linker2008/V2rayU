@@ -12,22 +12,39 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-    # CocoaPods 依赖（如果有 Podfile）
+    # CocoaPods 依赖（如果项目有 Podfile，否者可移除）
     - name: Install CocoaPods
+      if: hashFiles('Podfile') != ''
       run: |
         which pod || sudo gem install cocoapods
-        pod install || true
+        pod install
 
-    - name: Build with Xcode
+    # 构建 V2rayU（根据项目实际，优先用 xcworkspace，否则用 xcodeproj）
+    - name: Build V2rayU
       run: |
-        xcodebuild -workspace V2rayU.xcworkspace -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        if [ -f "V2rayU.xcworkspace" ]; then
+          xcodebuild -workspace V2rayU.xcworkspace -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        else
+          xcodebuild -project V2rayU.xcodeproj -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        fi
 
-    # 保存构建产物
+    # 导出 .app 文件
+    - name: Find built .app
+      id: find_app
+      run: |
+        APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "V2rayU.app" | head -n 1)
+        if [ -z "$APP_PATH" ]; then
+          echo "V2rayU.app not found"
+          exit 1
+        fi
+        echo "app_path=$APP_PATH" >> $GITHUB_OUTPUT
+
+    # 上传构建产物
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: V2rayU-app
-        path: |
-          build/Release/V2rayU.app
+        path: ${{ steps.find_app.outputs.app_path }}
