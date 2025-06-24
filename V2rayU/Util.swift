@@ -608,3 +608,16 @@ func runCommand(at path: String, with arguments: [String]) throws -> String {
         }
     }
 }
+
+func startProcess(at path: String, with arguments: [String]) throws -> Process {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: path)
+    process.arguments = arguments
+
+    let pipe = Pipe()
+    process.standardOutput = pipe
+    process.standardError = pipe
+
+    try process.run()
+    return process // 返回 Process 以便后续管理
+}

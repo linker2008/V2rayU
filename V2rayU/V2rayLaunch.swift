@@ -47,6 +47,8 @@ func executeAppleScriptWithOsascript(script: String) {
 }
 
 class V2rayLaunch: NSObject {
+    private var v2rayProcess: Process?
+
     static func checkInstall() {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
@@ -333,8 +335,7 @@ class V2rayLaunch: NSObject {
 
         // just start: stop is so slow
         do {
-            let output = try runCommand(at: v2rayCoreFile, with: ["run", "-c", JsonConfigFilePath])
-            print("Start v2ray-core: ok \(output)")
+            v2rayProcess = try startProcess(at: v2rayCoreFile, with: ["run", "-c", JsonConfigFilePath])
             return true
         } catch let error {
             alertDialog(title: "Start v2ray-core failed.", message: error.localizedDescription)
@@ -344,8 +345,8 @@ class V2rayLaunch: NSObject {
 
     static func Stop() {
         do {
-            let output = try runCommand(at: "/bin/launchctl", with: ["stop", LAUNCH_AGENT_NAME])
-            print("setSystemProxy: ok \(output)")
+            v2rayProcess?.terminate()
+            v2rayProcess = nil
         } catch let error {
             alertDialog(title: "Stop Error", message: error.localizedDescription)
         }
