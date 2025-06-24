@@ -9,6 +9,7 @@
 import Cocoa
 import Swifter
 import SystemConfiguration
+import Foundation
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
@@ -47,7 +48,7 @@ func executeAppleScriptWithOsascript(script: String) {
 }
 
 class V2rayLaunch: NSObject {
-    private var v2rayProcess: Process?
+    private static var v2rayProcess: Foundation.Process?
 
     static func checkInstall() {
         // Ensure launch agent directory is existed.
