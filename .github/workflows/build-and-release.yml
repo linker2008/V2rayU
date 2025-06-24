@@ -24,11 +24,17 @@ jobs:
         xcodebuild -workspace V2rayU.xcworkspace -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
     # 可选：打包 dmg（假设有 create-dmg 工具）
+    # /Users/runner/Library/Developer/Xcode/DerivedData/V2rayU-bykupptquanfqvgcmrqvoszjfvbj/Build/Products/Release/V2rayU.app
     - name: Package to DMG
       run: |
         brew install create-dmg
         APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "V2rayU.app" | head -n 1)
-        create-dmg "$APP_PATH" ./V2rayU.dmg
+        if [ -d "$APP_PATH" ]; then
+          create-dmg V2rayU.dmg "$APP_PATH"
+        else
+          echo "❌ V2rayU.app not found, skip DMG packaging."
+          exit 1
+        fi
 
     - name: Get version from tag
       id: get_version
