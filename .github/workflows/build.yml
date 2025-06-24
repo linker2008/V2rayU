@@ -38,7 +38,7 @@ jobs:
     # 构建 V2rayU（根据项目实际，优先用 xcworkspace，否则用 xcodeproj）
     - name: Build V2rayU
       run: |
-        if [ -f "V2rayU.xcworkspace" ]; then
+        if [ -d "V2rayU.xcworkspace" ]; then
           xcodebuild -workspace V2rayU.xcworkspace -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
         else
           xcodebuild -project V2rayU.xcodeproj -scheme V2rayU -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
