@@ -22,6 +22,13 @@ jobs:
         which pod || sudo gem install cocoapods
         pod install
 
+    - name: Ensure xcworkspace exists
+      run: |
+        if [ ! -f "V2rayU.xcworkspace" ]; then
+          echo "❌ V2rayU.xcworkspace not found! pod install did not succeed."
+          exit 1
+        fi
+
     # 构建 V2rayU（根据项目实际，优先用 xcworkspace，否则用 xcodeproj）
     - name: Build V2rayU
       run: |
